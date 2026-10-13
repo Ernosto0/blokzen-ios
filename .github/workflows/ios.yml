@@ -7,6 +7,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   ipa:
     runs-on: macos-15
@@ -44,6 +47,23 @@ jobs:
           cp -R build/Build/Products/Release-iphoneos/App.app Payload/
           zip -qr Blokzen.ipa Payload
           ls -lh Blokzen.ipa
+          APP=Payload/App.app
+          SIZE=$(du -h Blokzen.ipa | cut -f1)
+          NAME=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' $APP/Info.plist)
+          BID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' $APP/Info.plist)
+          test -f $APP/public/index.html
+          HAPTICS=$(grep -rl CapacitorHaptics $APP 2>/dev/null | head -1 | xargs -I{} basename {} || true)
+          echo "::notice title=IPA::name=$NAME id=$BID size=$SIZE game=ok haptics=${HAPTICS:-missing} icon=$(test -f $APP/Assets.car && echo ok)"
+
+      - name: Publish to the Releases page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest Blokzen.ipa \
+            --title "Blokzen iPhone test build #${{ github.run_number }}" \
+            --notes "Unsigned build. Install on your iPhone with Sideloadly using your Apple ID." \
+            --latest
 
       - uses: actions/upload-artifact@v4
         with:
