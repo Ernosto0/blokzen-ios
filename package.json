@@ -1,0 +1,19 @@
+{
+  "name": "blokzen-ios",
+  "version": "1.0.0",
+  "description": "Blokzen iOS app (Capacitor shell around the web game)",
+  "scripts": {
+    "sync": "cap sync ios"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/core": "^7.6.9",
+    "@capacitor/haptics": "^7.0.5",
+    "@capacitor/ios": "^7.6.9"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.6.9"
+  },
+  "private": true
+}
